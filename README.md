@@ -155,9 +155,8 @@ POST /predict
 Add screenshots of the application here.
 
 ```
-screenshots/home.png
+<img width="1488" height="896" alt="WhatsApp Image 2026-07-27 at 2 38 12 AM" src="https://github.com/user-attachments/assets/7757dcb1-9fb3-43d0-8356-1a65b5ed0538" />
 
-screenshots/prediction.png
 ```
 
 ---
@@ -183,10 +182,6 @@ Computer Science and Engineering Student
 
 Machine Learning and AI Enthusiast
 
-GitHub: https://github.com/samifahim07
 
 ---
 
-## License
-
-This project is intended for educational and portfolio purposes.
