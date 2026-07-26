@@ -152,7 +152,7 @@ POST /predict
 ### Home Page
 
 <p align="center">
-  <img src="screenshots/home-page.png" alt="Laptop Price Prediction Home Page" width="100%">
+  <img src="[screenshots/home-page.png" alt="Laptop Price Prediction Home Page" width="100%](https://github.com/samifahim07/Laptop-Price-prediciton-using-ML/blob/main/Home.jpeg)">
 </p
 
 
