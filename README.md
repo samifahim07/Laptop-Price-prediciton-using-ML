@@ -149,13 +149,10 @@ POST /predict
 
 
 ---
+### Home Page
 
-## Screenshots
+![Home Page](<img width="1488" height="896" alt="WhatsApp Image 2026-07-27 at 2 38 12 AM" src="https://github.com/user-attachments/assets/1c88b3a6-237f-484e-a71e-b12e082925ff" />)
 
-Add screenshots of the application here.
-
-```
-<img width="1488" height="896" alt="WhatsApp Image 2026-07-27 at 2 38 12 AM" src="https://github.com/user-attachments/assets/7757dcb1-9fb3-43d0-8356-1a65b5ed0538" />
 
 ```
 
