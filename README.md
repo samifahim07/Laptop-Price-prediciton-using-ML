@@ -151,7 +151,9 @@ POST /predict
 ---
 ### Home Page
 
-![Home Page](<img width="1488" height="896" alt="WhatsApp Image 2026-07-27 at 2 38 12 AM" src="https://github.com/user-attachments/assets/1c88b3a6-237f-484e-a71e-b12e082925ff" />)
+<p align="center">
+  <img src="screenshots/home-page.png" alt="Laptop Price Prediction Home Page" width="100%">
+</p
 
 
 ```
