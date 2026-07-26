@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LaptopIQ — SamiTech</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:       #000000;
+      --surface:  #0a0a0f;
+      --card:     #0d0d15;
+      --border:   #1a1a2e;
+      --purple:   #8b5cf6;
+      --violet:   #a78bfa;
+      --cyan:     #06b6d4;
+      --pink:     #ec4899;
+      --green:    #10b981;
+      --text-1:   #f8f8ff;
+      --text-2:   #8b8ba8;
+      --text-3:   #3d3d5c;
+      --r: 14px;
+      --rs: 9px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000;
+      color: var(--text-1);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ═══════════════════════════════════════════════
+       3D CANVAS BACKGROUND
+    ═══════════════════════════════════════════════ */
+    #canvas3d {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .page-wrap {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ═══════════════════════════════════════════════
+       TOP BAR — SamiTech brand only
+    ═══════════════════════════════════════════════ */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 36px;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(139,92,246,0.2);
+    }
+    .samitech {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .samitech-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--purple), var(--cyan));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px; font-weight: 800; color: #fff;
+      box-shadow: 0 0 16px rgba(139,92,246,0.6);
+    }
+    .samitech-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px; font-weight: 700;
+      letter-spacing: 3px;
+      color: #fff;
+      text-transform: uppercase;
+    }
+    .samitech-label span { color: var(--violet); }
+    .topbar-tag {
+      font-size: 11px;
+      color: var(--text-3);
+      letter-spacing: 1px;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    /* ═══════════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════════ */
+    .hero {
+      text-align: center;
+      padding: 50px 24px 36px;
+    }
+    .hero-chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid rgba(139,92,246,0.4);
+      background: rgba(139,92,246,0.08);
+      border-radius: 30px;
+      padding: 6px 16px;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--violet);
+      margin-bottom: 22px;
+    }
+    .chip-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+      animation: blink 1.6s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    .hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(30px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.15;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(90deg, var(--purple), var(--cyan), var(--pink));
+      background-size: 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: hueShift 4s linear infinite;
+    }
+    @keyframes hueShift { 0%{background-position:0%} 100%{background-position:200%} }
+
+    .hero-sub {
+      margin-top: 14px;
+      color: var(--text-2);
+      font-size: 14px;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .hero-sub-dot { color: var(--purple); font-size: 8px; }
+
+    /* ═══════════════════════════════════════════════
+       MAIN LAYOUT — 3 columns
+    ═══════════════════════════════════════════════ */
+    main {
+      flex: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+      width: 100%;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 220px 1fr 300px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* ═══════════════════════════════════════════════
+       LEFT PANEL — SamiTech info
+    ═══════════════════════════════════════════════ */
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: sticky;
+      top: 24px;
+    }
+    .brand-card {
+      background: var(--surface);
+      border: 1px solid rgba(139,92,246,0.25);
+      border-radius: var(--r);
+      padding: 22px 18px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .brand-card::before {
+      content: '';
+      position: absolute;
+      top: -30px; left: -30px;
+      width: 120px; height: 120px;
+      background: radial-gradient(circle, rgba(139,92,246,0.2), transparent 70%);
+      pointer-events: none;
+    }
+    .brand-logo-big {
+      width: 54px; height: 54px;
+      background: linear-gradient(135deg, var(--purple), var(--cyan));
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 22px; font-weight: 800; color: #fff;
+      margin: 0 auto 12px;
+      box-shadow: 0 0 24px rgba(139,92,246,0.5), 0 0 48px rgba(6,182,212,0.2);
+      animation: logoGlow 3s ease-in-out infinite;
+    }
+    @keyframes logoGlow {
+      0%,100% { box-shadow: 0 0 24px rgba(139,92,246,0.5), 0 0 48px rgba(6,182,212,0.2); }
+      50%      { box-shadow: 0 0 36px rgba(139,92,246,0.8), 0 0 60px rgba(6,182,212,0.4); }
+    }
+    .brand-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 15px; font-weight: 800;
+      letter-spacing: 3px; color: #fff;
+      text-transform: uppercase;
+    }
+    .brand-name span { color: var(--violet); }
+    .brand-desc {
+      margin-top: 8px;
+      font-size: 11px; color: var(--text-3);
+      line-height: 1.6;
+    }
+
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 16px;
+    }
+    .info-card-title {
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--text-3); margin-bottom: 12px;
+    }
+    .info-row {
+      display: flex; justify-content: space-between;
+      font-size: 12px; padding: 6px 0;
+      border-bottom: 1px solid rgba(26,26,46,0.8);
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-key { color: var(--text-2); }
+    .info-val { color: var(--violet); font-weight: 600; font-size: 11px; }
+
+    /* RGB border animation for brand card */
+    .rgb-border {
+      position: relative;
+    }
+    .rgb-border::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--r);
+      padding: 1px;
+      background: linear-gradient(var(--angle, 0deg), var(--purple), var(--cyan), var(--pink), var(--purple));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: rotateBorder 4s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes rotateBorder {
+      0%   { --angle: 0deg; }
+      100% { --angle: 360deg; }
+    }
+    @property --angle {
+      syntax: '<angle>';
+      initial-value: 0deg;
+      inherits: false;
+    }
+
+    /* ═══════════════════════════════════════════════
+       CENTER — FORM
+    ═══════════════════════════════════════════════ */
+    .form-card {
+      background: rgba(10,10,15,0.9);
+      border: 1px solid rgba(139,92,246,0.2);
+      border-radius: var(--r);
+      padding: 28px;
+      backdrop-filter: blur(10px);
+    }
+    .section-label {
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase;
+      color: var(--violet); margin-bottom: 18px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-label::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(90deg, rgba(139,92,246,0.4), transparent);
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label {
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--text-3);
+    }
+    .field select,
+    .field input {
+      background: rgba(0,0,0,0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--rs);
+      color: var(--text-1);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      width: 100%;
+      appearance: none; -webkit-appearance: none;
+    }
+    .field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238b5cf6' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 30px;
+    }
+    .field select:focus, .field input:focus {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 2px rgba(139,92,246,0.2), 0 0 12px rgba(139,92,246,0.15);
+    }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+
+    .predict-btn {
+      width: 100%; margin-top: 20px; padding: 14px;
+      background: linear-gradient(90deg, var(--purple), var(--cyan), var(--pink), var(--purple));
+      background-size: 300%;
+      border: none; border-radius: var(--rs);
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px; font-weight: 700; letter-spacing: 2px;
+      cursor: pointer; text-transform: uppercase;
+      animation: btnShift 3s linear infinite;
+      transition: transform .15s, box-shadow .2s;
+      box-shadow: 0 0 20px rgba(139,92,246,0.4);
+    }
+    @keyframes btnShift { 0%{background-position:0%} 100%{background-position:300%} }
+    .predict-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(139,92,246,0.7), 0 0 60px rgba(6,182,212,0.3);
+    }
+    .predict-btn:active { transform: translateY(0); }
+    .predict-btn:disabled { opacity:.4; cursor:not-allowed; transform:none; animation:none; }
+
+    .error-msg {
+      background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25);
+      border-radius: var(--rs); color: #f87171;
+      font-size: 12px; padding: 10px 14px;
+      display: none; margin-top: 10px;
+    }
+    .error-msg.visible { display: block; }
+
+    /* ═══════════════════════════════════════════════
+       RIGHT PANEL — Result
+    ═══════════════════════════════════════════════ */
+    .result-panel {
+      position: sticky;
+      top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .result-placeholder {
+      background: var(--surface);
+      border: 1px dashed rgba(139,92,246,0.2);
+      border-radius: var(--r);
+      padding: 50px 18px;
+      text-align: center;
+      color: var(--text-3);
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+    }
+    .result-placeholder svg { opacity: .2; }
+    .result-placeholder p { font-size: 12px; line-height: 1.7; }
+
+    .result-card {
+      background: var(--surface);
+      border: 1px solid rgba(139,92,246,0.25);
+      border-radius: var(--r);
+      overflow: hidden;
+      display: none;
+    }
+    .result-card.visible { display: block; }
+
+    .laptop-img-wrap {
+      position: relative; height: 200px; overflow: hidden; background: #050508;
+    }
+    .laptop-img-wrap img {
+      width:100%; height:100%; object-fit: cover; transition: transform .5s;
+    }
+    .laptop-img-wrap:hover img { transform: scale(1.05); }
+    .img-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,.95) 0%, rgba(0,0,0,.3) 55%, transparent 100%);
+    }
+    .price-label {
+      position: absolute; top: 12px; right: 12px;
+      background: rgba(139,92,246,0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(167,139,250,0.4);
+      color: #fff; font-size: 9px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 20px;
+    }
+    .price-badge {
+      position: absolute; bottom: 14px; left: 14px;
+      display: flex; align-items: flex-end; gap: 4px;
+    }
+    .price-currency {
+      font-size: 13px; font-weight: 600;
+      color: var(--violet); margin-bottom: 3px;
+    }
+    .price-amount {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 32px; font-weight: 800; line-height: 1; color: #fff;
+      text-shadow: 0 0 20px rgba(139,92,246,0.8), 0 0 40px rgba(6,182,212,0.4);
+    }
+
+    .specs-body { padding: 16px; }
+    .specs-title {
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--text-3); margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .specs-title::after { content:''; flex:1; height:1px; background: linear-gradient(90deg, var(--border), transparent); }
+    .spec-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 6px 0; border-bottom: 1px solid rgba(26,26,46,0.7); font-size: 12px;
+    }
+    .spec-row:last-child { border-bottom: none; }
+    .spec-key { color: var(--text-2); }
+    .spec-val { color: var(--text-1); font-weight: 600; font-size: 11px; text-align: right; max-width: 55%; }
+
+    .confidence {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 12px 16px;
+      display: none; align-items: center; gap: 10px;
+    }
+    .confidence.visible { display: flex; }
+    .conf-dot { width:8px; height:8px; border-radius:50%; background:var(--green); flex-shrink:0; box-shadow: 0 0 8px var(--green); }
+    .conf-text { font-size: 11px; color: var(--text-2); }
+    .conf-text strong { color: var(--green); }
+
+    /* ═══════════════════════════════════════════════
+       SPINNER
+    ═══════════════════════════════════════════════ */
+    .spinner {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,.2); border-top-color: #fff;
+      border-radius: 50%; animation: spin .7s linear infinite;
+      vertical-align: middle; margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ═══════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════ */
+    footer {
+      text-align: center; padding: 18px;
+      border-top: 1px solid rgba(139,92,246,0.15);
+      font-size: 11px; color: var(--text-3);
+    }
+    footer span { color: var(--violet); font-weight: 600; }
+
+    /* ═══════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════ */
+    @media (max-width: 960px) {
+      .layout { grid-template-columns: 1fr; }
+      .left-panel { position: static; display: grid; grid-template-columns: 1fr 1fr; }
+      .result-panel { position: static; }
+    }
+    @media (max-width: 560px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .left-panel { grid-template-columns: 1fr; }
+      .topbar { padding: 10px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 3D canvas background -->
+<canvas id="canvas3d"></canvas>
+
+<div class="page-wrap">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="samitech">
+      <div class="samitech-icon">S</div>
+      <span class="samitech-label">Sami<span>Tech</span></span>
+    </div>
+    <span class="topbar-tag">AI · MACHINE LEARNING · INNOVATION</span>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-chip">
+      <span class="chip-dot"></span>
+      AI Price Intelligence
+    </div>
+    <h1>Predict the <em>right price</em><br>before you buy</h1>
+    <div class="hero-sub">
+      <span>Smart Prediction</span>
+      <span class="hero-sub-dot">◆</span>
+      <span>Real Market Data</span>
+      <span class="hero-sub-dot">◆</span>
+      <span>Instant Results</span>
+    </div>
+  </div>
+
+  <!-- Main 3-col layout -->
+  <main>
+    <div class="layout">
+
+      <!-- LEFT — SamiTech brand panel -->
+      <div class="left-panel">
+        <div class="brand-card rgb-border">
+          <div class="brand-logo-big">S</div>
+          <div class="brand-name">Sami<span>Tech</span></div>
+          <p class="brand-desc">AI &amp; Machine Learning solutions for the next generation</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-title">Model Info</div>
+          <div class="info-row"><span class="info-key">Algorithm</span><span class="info-val">ML Regressor</span></div>
+          <div class="info-row"><span class="info-key">R² Score</span><span class="info-val">0.741</span></div>
+          <div class="info-row"><span class="info-key">Training</span><span class="info-val">80 / 20</span></div>
+          <div class="info-row"><span class="info-key">Currency</span><span class="info-val">Euro (€)</span></div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-title">Dataset</div>
+          <div class="info-row"><span class="info-key">Brands</span><span class="info-val">19</span></div>
+          <div class="info-row"><span class="info-key">Features</span><span class="info-val">11</span></div>
+          <div class="info-row"><span class="info-key">Market</span><span class="info-val">Europe</span></div>
+        </div>
+      </div>
+
+      <!-- CENTER — Form -->
+      <div class="form-card">
+        <div class="section-label">Laptop Configuration</div>
+
+        <div class="grid-2">
+          <div class="field"><label>Brand</label><select id="company"></select></div>
+          <div class="field"><label>Laptop Type</label><select id="type_name"></select></div>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="grid-3">
+          <div class="field">
+            <label>Screen Size (in)</label>
+            <input type="number" id="inches" value="15.6" min="10" max="20" step="0.1" />
+          </div>
+          <div class="field"><label>Resolution</label><select id="screen_res"></select></div>
+          <div class="field">
+            <label>Weight (kg)</label>
+            <input type="number" id="weight" value="1.9" min="0.5" max="5" step="0.1" />
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="grid-2">
+          <div class="field"><label>CPU</label><select id="cpu"></select></div>
+          <div class="field"><label>GPU</label><select id="gpu"></select></div>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="grid-3">
+          <div class="field">
+            <label>RAM (GB)</label>
+            <input type="number" id="ram" value="8" min="1" max="128" step="1" />
+          </div>
+          <div class="field"><label>Storage</label><select id="memory"></select></div>
+          <div class="field"><label>OS</label><select id="op_sys"></select></div>
+        </div>
+
+        <button class="predict-btn" id="predictBtn" onclick="predict()">
+          ⚡ Predict Price
+        </button>
+        <div class="error-msg" id="errorMsg"></div>
+      </div>
+
+      <!-- RIGHT — Result -->
+      <div class="result-panel">
+        <div class="result-placeholder" id="placeholder">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+          <p>Configure specs &amp; hit<br/><strong>⚡ Predict Price</strong><br/>for instant estimate</p>
+        </div>
+
+        <div class="result-card" id="resultCard">
+          <div class="laptop-img-wrap">
+            <img id="laptopImg" src="" alt="Laptop" />
+            <div class="img-overlay"></div>
+            <div class="price-label">Estimated Price</div>
+            <div class="price-badge">
+              <span class="price-currency">€</span>
+              <span class="price-amount" id="priceAmount">—</span>
+            </div>
+          </div>
+          <div class="specs-body">
+            <div class="specs-title">Specifications</div>
+            <div id="specsGrid"></div>
+          </div>
+        </div>
+
+        <div class="confidence" id="confidenceNote">
+          <div class="conf-dot"></div>
+          <div class="conf-text">ML Model · R² <strong>0.74</strong> accuracy</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>Built by <span>SamiTech</span> · AI &amp; Machine Learning Division</footer>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   3D PARTICLE / GRID ANIMATION
+═══════════════════════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('canvas3d');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles, lines;
+  let hue = 0;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  // Floating particles
+  function makeParticle() {
+    return {
+      x: Math.random() * W,
+      y: Math.random() * H,
+      z: Math.random(),           // depth 0..1
+      vx: (Math.random() - .5) * .4,
+      vy: (Math.random() - .5) * .4,
+      r:  1 + Math.random() * 2,
+      hue: Math.random() * 60 + 260  // purple-cyan range
+    };
+  }
+
+  // Grid lines (perspective)
+  function drawGrid() {
+    const cols = 14, rows = 10;
+    const gw = W / cols, gh = H * .6 / rows;
+    const vanishX = W / 2, vanishY = H * .35;
+    ctx.save();
+    for (let c = 0; c <= cols; c++) {
+      const x0 = c * gw;
+      const t = c / cols;
+      const alpha = .04 + .06 * Math.abs(t - .5) * 2;
+      ctx.beginPath();
+      ctx.moveTo(x0, H);
+      ctx.lineTo(vanishX, vanishY);
+      ctx.strokeStyle = `hsla(${270 + hue * .5}, 80%, 60%, ${alpha})`;
+      ctx.lineWidth = .5;
+      ctx.stroke();
+    }
+    for (let r = 0; r <= rows; r++) {
+      const t = r / rows;
+      const y0 = H - t * H * .5;
+      const spread = .1 + t * .9;
+      const x0 = vanishX - (W / 2) * spread;
+      const x1 = vanishX + (W / 2) * spread;
+      const alpha = .03 + .04 * t;
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(x1, y0);
+      ctx.strokeStyle = `hsla(${200 + hue * .3}, 80%, 60%, ${alpha})`;
+      ctx.lineWidth = .5;
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function init() {
+    resize();
+    particles = Array.from({length: 80}, makeParticle);
+  }
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+
+    hue = (hue + .15) % 360;
+
+    // grid
+    drawGrid();
+
+    // connect nearby particles
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const p = particles[i], q = particles[j];
+        const dx = p.x - q.x, dy = p.y - q.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 120) {
+          const alpha = (1 - dist / 120) * .12;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(q.x, q.y);
+          ctx.strokeStyle = `hsla(${280 + hue * .2}, 80%, 65%, ${alpha})`;
+          ctx.lineWidth = .6;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // draw & move particles
+    particles.forEach(p => {
+      const depth = .4 + p.z * .6;
+      const radius = p.r * depth;
+      const alpha = .3 + p.z * .5;
+
+      // glow
+      const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius * 4);
+      grad.addColorStop(0, `hsla(${p.hue + hue * .1}, 90%, 70%, ${alpha})`);
+      grad.addColorStop(1, `hsla(${p.hue + hue * .1}, 90%, 70%, 0)`);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, radius * 4, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // core
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${p.hue + hue * .1}, 90%, 80%, ${alpha + .2})`;
+      ctx.fill();
+
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0) p.x = W;
+      if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H;
+      if (p.y > H) p.y = 0;
+    });
+
+    requestAnimationFrame(frame);
+  }
+
+  window.addEventListener('resize', () => { resize(); });
+  init();
+  frame();
+})();
+
+/* ═══════════════════════════════════════════════════════
+   DROPDOWN DATA
+═══════════════════════════════════════════════════════ */
+const DATA = {
+  company:    ["Acer","Apple","Asus","Chuwi","Dell","Fujitsu","Google","HP",
+               "Huawei","LG","Lenovo","MSI","Mediacom","Microsoft","Razer",
+               "Samsung","Toshiba","Vero","Xiaomi"],
+  type_name:  ["2 in 1 Convertible","Gaming","Netbook","Notebook","Ultrabook","Workstation"],
+  screen_res: ["1366x768","1440x900","1600x900","1920x1080","1920x1200",
+               "2160x1440","2256x1504","2304x1440","2560x1440","2560x1600",
+               "2880x1800","3200x1800","3840x2160"],
+  cpu:        ["AMD A4","AMD A6","AMD A9","AMD E-Series","AMD Ryzen 3",
+               "AMD Ryzen 5","AMD Ryzen 7","Intel Atom","Intel Celeron",
+               "Intel Core M","Intel Core i3","Intel Core i5","Intel Core i7",
+               "Intel Pentium","Intel Xeon","Samsung"],
+  memory:     ["16GB","32GB","4GB","64GB","8GB"],
+  gpu:        ["AMD","ARM","Intel","Nvidia"],
+  op_sys:     ["Android","Chrome OS","Linux","No OS","Windows 10","Windows 10 S","Windows 7","macOS"],
+};
+const DEFAULTS = { screen_res:"1920x1080", cpu:"Intel Core i5", memory:"8GB", op_sys:"Windows 10", gpu:"Intel" };
+
+function populateDropdowns() {
+  for (const [id, opts] of Object.entries(DATA)) {
+    const sel = document.getElementById(id);
+    if (!sel) continue;
+    opts.forEach(o => {
+      const el = document.createElement('option');
+      el.value = o; el.textContent = o;
+      if (DEFAULTS[id] === o) el.selected = true;
+      sel.appendChild(el);
+    });
+  }
+}
+populateDropdowns();
+
+/* ═══════════════════════════════════════════════════════
+   PREDICT
+═══════════════════════════════════════════════════════ */
+async function predict() {
+  const btn = document.getElementById('predictBtn');
+  const err = document.getElementById('errorMsg');
+  err.classList.remove('visible');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Analysing…';
+
+  const payload = {
+    company:    document.getElementById('company').value,
+    type_name:  document.getElementById('type_name').value,
+    inches:     parseFloat(document.getElementById('inches').value),
+    screen_res: document.getElementById('screen_res').value,
+    cpu:        document.getElementById('cpu').value,
+    ram:        parseInt(document.getElementById('ram').value),
+    memory:     document.getElementById('memory').value,
+    gpu:        document.getElementById('gpu').value,
+    op_sys:     document.getElementById('op_sys').value,
+    weight:     parseFloat(document.getElementById('weight').value),
+  };
+
+  try {
+    const res  = await fetch('/predict', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+    const data = await res.json();
+    if (data.error) { err.textContent = 'Error: ' + data.error; err.classList.add('visible'); return; }
+
+    document.getElementById('laptopImg').src = data.image_url;
+
+    const grid = document.getElementById('specsGrid');
+    grid.innerHTML = '';
+    for (const [k, v] of Object.entries(data.specs)) {
+      const row = document.createElement('div');
+      row.className = 'spec-row';
+      row.innerHTML = `<span class="spec-key">${k}</span><span class="spec-val">${v}</span>`;
+      grid.appendChild(row);
+    }
+
+    document.getElementById('placeholder').style.display = 'none';
+    document.getElementById('resultCard').classList.add('visible');
+    document.getElementById('confidenceNote').classList.add('visible');
+    animatePrice(data.price);
+
+  } catch(e) {
+    err.textContent = 'Network error — is Flask running?';
+    err.classList.add('visible');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '⚡ Predict Price';
+  }
+}
+
+function animatePrice(target) {
+  const el = document.getElementById('priceAmount');
+  const dur = 800, t0 = performance.now();
+  const from = parseFloat(el.textContent.replace(/,/g,'')) || 0;
+  function tick(now) {
+    const t = Math.min((now - t0) / dur, 1);
+    const e = t < .5 ? 2*t*t : -1 + (4-2*t)*t;
+    el.textContent = (from + (target-from)*e).toLocaleString('en-EU',{minimumFractionDigits:2,maximumFractionDigits:2});
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+</script>
+</body>
+</html>
