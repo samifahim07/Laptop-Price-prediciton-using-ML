@@ -1,4 +1,4 @@
-# Laptop Price Prediction using Machine Learning
+# Laptop Price Predictor
 
 A full-stack Machine Learning web application that predicts laptop prices based on hardware specifications. The project combines a trained XGBoost regression model with a Flask backend and a responsive web interface, allowing users to estimate laptop prices instantly by selecting different hardware configurations.
 
